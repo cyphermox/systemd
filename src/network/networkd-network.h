@@ -60,6 +60,14 @@ typedef enum DHCPUseDomains {
         _DHCP_USE_DOMAINS_INVALID = -1,
 } DHCPUseDomains;
 
+typedef enum ActivationMode {
+        ACTIVATION_MODE_OFF = 0,
+        ACTIVATION_MODE_ON = 1,
+        ACTIVATION_MODE_MANUAL = 2,
+        _ACTIVATION_MODE_MAX,
+        _ACTIVATION_MODE_INVALID = -1,
+} ActivationMode;
+
 typedef struct DUID {
         /* Value of Type in [DHCP] section */
         DUIDType type;
@@ -246,6 +254,7 @@ struct Network {
 
         bool required_for_online; /* Is this network required to be considered online? */
         LinkOperationalState required_operstate_for_online;
+        ActivationMode activation_mode; /* Should we activate the device? */
 
         LLDPMode lldp_mode; /* LLDP reception */
         LLDPEmit lldp_emit; /* LLDP transmission */
@@ -325,6 +334,7 @@ CONFIG_PARSER_PROTOTYPE(config_parse_dhcp_server_ntp);
 CONFIG_PARSER_PROTOTYPE(config_parse_dnssec_negative_trust_anchors);
 CONFIG_PARSER_PROTOTYPE(config_parse_dhcp_use_domains);
 CONFIG_PARSER_PROTOTYPE(config_parse_section_route_table);
+CONFIG_PARSER_PROTOTYPE(config_parse_activation_mode);
 CONFIG_PARSER_PROTOTYPE(config_parse_dhcp_user_class);
 CONFIG_PARSER_PROTOTYPE(config_parse_ntp);
 CONFIG_PARSER_PROTOTYPE(config_parse_iaid);
@@ -352,3 +362,6 @@ RADVPrefixDelegation radv_prefix_delegation_from_string(const char *s) _pure_;
 
 const char* keep_configuration_to_string(KeepConfiguration i) _const_;
 KeepConfiguration keep_configuration_from_string(const char *s) _pure_;
+
+const char* activation_mode_to_string(ActivationMode m) _const_;
+ActivationMode activation_mode_from_string(const char *s) _pure_;
