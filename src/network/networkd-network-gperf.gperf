@@ -35,6 +35,7 @@ Link.MTUBytes,                          config_parse_iec_size,                  
 Link.ARP,                               config_parse_tristate,                          0,                             offsetof(Network, arp)
 Link.Unmanaged,                         config_parse_bool,                              0,                             offsetof(Network, unmanaged)
 Link.RequiredForOnline,                 config_parse_bool,                              0,                             offsetof(Network, required_for_online)
+Link.KeepDown,                          config_parse_bool,                              0,                             offsetof(Network, keep_down)
 Network.Description,                    config_parse_string,                            0,                             offsetof(Network, description)
 Network.Bridge,                         config_parse_netdev,                            0,                             offsetof(Network, bridge)
 Network.Bond,                           config_parse_netdev,                            0,                             offsetof(Network, bond)

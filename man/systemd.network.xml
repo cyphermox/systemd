@@ -278,6 +278,17 @@
           if <literal>RequiredForOnline=true</literal>.</para>
         </listitem>
       </varlistentry>
+      <varlistentry>
+        <term><varname>KeepDown=</varname></term>
+        <listitem>
+          <para>A boolean. When <literal>yes</literal>, the network is kept
+          offline at startup. And remains that way until an administrator
+          brings it up; with a command like <literal>ip link set up</literal>.
+          </para>
+          <para>When <literal>no</literal>, the network is handled normally and
+          managed as per other configuration parameters.</para>
+        </listitem>
+      </varlistentry>
     </variablelist>
   </refsect1>
 

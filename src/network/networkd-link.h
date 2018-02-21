@@ -168,6 +168,7 @@ int link_save(Link *link);
 
 int link_carrier_reset(Link *link);
 bool link_has_carrier(Link *link);
+bool link_has_foreign_addresses(Link *link);
 
 int link_ipv6ll_gained(Link *link, const struct in6_addr *address);
 

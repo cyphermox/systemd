@@ -1717,6 +1717,22 @@ bool link_has_carrier(Link *link) {
         return false;
 }
 
+bool link_has_foreign_addresses(Link *link) {
+        Address *address;
+        Iterator i;
+
+        SET_FOREACH(address, link->addresses_foreign, i) {
+                /* we consider IPv6LL addresses to be managed by the kernel */
+                if (address->family == AF_INET6 && in_addr_is_link_local(AF_INET6, &address->in_addr) == 1)
+                        continue;
+
+                return true;
+        }
+
+        return false;
+}
+
+
 static int link_up_handler(sd_netlink *rtnl, sd_netlink_message *m, void *userdata) {
         _cleanup_link_unref_ Link *link = userdata;
         int r;
@@ -2164,11 +2180,19 @@ static int link_joined(Link *link) {
         assert(link);
         assert(link->network);
 
+        if (!link_has_foreign_addresses(link) && link->network->keep_down) {
+                log_link_debug(link, "shutting down link as requested by configuration");
+                r = link_down(link);
+                if (r < 0)
+                        return r;
+                return 0;
+        }
+
         if (!hashmap_isempty(link->bound_to_links)) {
                 r = link_handle_bound_to_list(link);
                 if (r < 0)
                         return r;
-        } else if (!(link->flags & IFF_UP)) {
+        } else if (!link->network->keep_down && !(link->flags & IFF_UP)) {
                 r = link_up(link);
                 if (r < 0) {
                         link_enter_failed(link);
@@ -2583,7 +2607,7 @@ static int link_configure(Link *link) {
 
         if (streq_ptr(link->kind, "vcan")) {
 
-                if (!(link->flags & IFF_UP)) {
+                if (!link->network->keep_down && !(link->flags & IFF_UP)) {
                         r = link_up_can(link);
                         if (r < 0) {
                                 link_enter_failed(link);
@@ -2716,7 +2740,7 @@ static int link_configure(Link *link) {
                         return r;
         }
 
-        if (link_has_carrier(link) || link->network->configure_without_carrier) {
+        if (!link->network->keep_down && (link_has_carrier(link) || link->network->configure_without_carrier)) {
                 r = link_acquire_conf(link);
                 if (r < 0)
                         return r;
@@ -3435,6 +3459,8 @@ int link_save(Link *link) {
 
                 fprintf(f, "REQUIRED_FOR_ONLINE=%s\n",
                         yes_no(link->network->required_for_online));
+                fprintf(f, "KEEP_DOWN=%s\n",
+                        yes_no(link->network->keep_down));
 
                 if (link->dhcp6_client) {
                         r = sd_dhcp6_client_get_lease(link->dhcp6_client, &dhcp6_lease);
