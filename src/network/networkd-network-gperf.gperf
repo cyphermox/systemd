@@ -37,6 +37,7 @@ Link.Multicast,                         config_parse_tristate,                  
 Link.AllMulticast,                      config_parse_tristate,                          0,                             offsetof(Network, allmulticast)
 Link.Unmanaged,                         config_parse_bool,                              0,                             offsetof(Network, unmanaged)
 Link.RequiredForOnline,                 config_parse_bool,                              0,                             offsetof(Network, required_for_online)
+Link.OptionalAddresses,                 config_parse_strv,                              0,                             offsetof(Network, optional_addresses)
 Network.Description,                    config_parse_string,                            0,                             offsetof(Network, description)
 Network.Bridge,                         config_parse_netdev,                            0,                             offsetof(Network, bridge)
 Network.Bond,                           config_parse_netdev,                            0,                             offsetof(Network, bond)

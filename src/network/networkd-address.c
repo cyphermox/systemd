@@ -30,6 +30,7 @@ int address_new(Address **ret) {
         address->scope = RT_SCOPE_UNIVERSE;
         address->cinfo.ifa_prefered = CACHE_INFO_INFINITY_LIFE_TIME;
         address->cinfo.ifa_valid = CACHE_INFO_INFINITY_LIFE_TIME;
+        address->source = _ADDRESS_SOURCE_INVALID;
 
         *ret = TAKE_PTR(address);
 
@@ -74,6 +75,7 @@ int address_new_static(Network *network, const char *filename, unsigned section_
         }
 
         address->network = network;
+        address->source = ADDRESS_SOURCE_CONFIG;
         LIST_APPEND(addresses, network->static_addresses, address);
         network->n_static_addresses++;
 
@@ -955,8 +957,31 @@ int config_parse_address_scope(const char *unit,
 bool address_is_ready(const Address *a) {
         assert(a);
 
-        if (a->family == AF_INET6)
-                return !(a->flags & IFA_F_TENTATIVE);
-        else
-                return !(a->flags & (IFA_F_TENTATIVE | IFA_F_DEPRECATED));
+        if (a->family == AF_INET6) {
+                if (a->source == ADDRESS_SOURCE_DHCP &&
+                           STR_IN_SET(a->link->network->optional_addresses, "dhcp6")) {
+                        return true;
+                } else if (a->source == ADDRESS_SOURCE_RA &&
+                           STR_IN_SET(a->link->network->optional_addresses, "ipv6ra")) {
+                        return true;
+                } else if (a->source == ADDRESS_SOURCE_CONFIG &&
+                           STR_IN_SET(a->link->network->optional_addresses, "static")) {
+                        return true;
+                } else {
+                        return !(a->flags & IFA_F_TENTATIVE);
+                }
+        } else {
+                if (a->source == ADDRESS_SOURCE_DHCP &&
+                           STR_IN_SET(a->link->network->optional_addresses, "dhcp4")) {
+                        return true;
+                } else if (a->source == ADDRESS_SOURCE_ZEROCONF &&
+                           STR_IN_SET(a->link->network->optional_addresses, "ipv4ll")) {
+                        return true;
+                } else if (a->source == ADDRESS_SOURCE_CONFIG &&
+                           STR_IN_SET(a->link->network->optional_addresses, "static")) {
+                        return true;
+                } else {
+                        return !(a->flags & (IFA_F_TENTATIVE | IFA_F_DEPRECATED));
+                }
+        }
 }

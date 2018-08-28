@@ -348,6 +348,7 @@ static int dhcp4_update_address(Link *link,
         addr->cinfo.ifa_valid = lifetime;
         addr->prefixlen = prefixlen;
         addr->broadcast.s_addr = address->s_addr | ~netmask->s_addr;
+        addr->source = ADDRESS_SOURCE_DHCP;
 
         /* allow reusing an existing address and simply update its lifetime
          * in case it already exists */

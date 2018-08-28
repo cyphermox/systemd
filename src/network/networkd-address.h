@@ -18,6 +18,16 @@ typedef struct Network Network;
 typedef struct Link Link;
 typedef struct NetworkConfigSection NetworkConfigSection;
 
+typedef enum AddressSource {
+        ADDRESS_SOURCE_KERNEL,
+        ADDRESS_SOURCE_RA,
+        ADDRESS_SOURCE_ZEROCONF,
+        ADDRESS_SOURCE_DHCP,
+        ADDRESS_SOURCE_CONFIG,
+        _ADDRESS_SOURCE_MAX,
+        _ADDRESS_SOURCE_INVALID = -1
+} AddressSource;
+
 struct Address {
         Network *network;
         NetworkConfigSection *section;
@@ -42,6 +52,8 @@ struct Address {
         bool home_address;
         bool prefix_route;
         bool autojoin;
+
+        AddressSource source;
 
         LIST_FIELDS(Address, addresses);
 };

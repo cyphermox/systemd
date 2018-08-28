@@ -205,6 +205,7 @@ static void ndisc_router_process_autonomous_prefix(Link *link, sd_ndisc_router *
         address->prefixlen = prefixlen;
         address->flags = IFA_F_NOPREFIXROUTE|IFA_F_MANAGETEMPADDR;
         address->cinfo.ifa_prefered = lifetime_preferred;
+        address->source = ADDRESS_SOURCE_RA;
 
         /* see RFC4862 section 5.5.3.e */
         r = address_get(link, address->family, &address->in_addr, address->prefixlen, &existing_address);

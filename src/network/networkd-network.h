@@ -221,6 +221,7 @@ struct Network {
         DUID duid;
 
         bool required_for_online; /* Is this network required to be considered online? */
+        char **optional_addresses;
 
         LLDPMode lldp_mode; /* LLDP reception */
         LLDPEmit lldp_emit; /* LLDP transmission */

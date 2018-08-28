@@ -293,6 +293,7 @@ static int dhcp6_address_change(
                 return r;
 
         addr->family = AF_INET6;
+        addr->source = ADDRESS_SOURCE_DHCP;
         memcpy(&addr->in_addr.in6, ip6_addr, sizeof(*ip6_addr));
 
         addr->flags = IFA_F_NOPREFIXROUTE;
